@@ -5,7 +5,10 @@
   ((universe :initform nil)
    (player :initform nil)
    (projectiles :initform nil)
-   (enemies :initform nil)))
+   (enemies :initform nil)
+   (start-time :initform (ge.util:real-time-seconds))
+   (next-state :initform nil)
+   (score :initform 0 :reader level-score)))
 
 
 (defun on-pre-solve (this that)
@@ -16,6 +19,12 @@
   (collide (shape-substance this) (shape-substance that)))
 
 
+(defun level-next-state (state &rest args &key &allow-other-keys)
+  (with-slots (next-state) (current-state)
+    (unless next-state
+      (setf next-state (append (list state) args)))))
+
+
 (defun spawn-enemy (level x y)
   (with-slots (enemies universe) level
     (let ((enemy (make-enemy universe x y)))
@@ -23,10 +32,11 @@
 
 
 (defun kill-enemy (enemy projectile)
-  (with-slots (enemies projectiles universe) (current-state)
+  (with-slots (enemies projectiles universe score) (current-state)
     (when (member enemy enemies)
       (destroy-enemy enemy)
-      (alexandria:deletef enemies enemy))
+      (alexandria:deletef enemies enemy)
+      (incf score))
     (when (member projectile projectiles)
       (destroy-projectile projectile)
       (alexandria:deletef projectiles projectile))))
@@ -100,22 +110,35 @@
 
 
 (defmethod act ((this level))
-  (with-slots (player universe enemies) this
+  (with-slots (player universe enemies next-state) this
+    (when next-state
+      (apply #'transition-to next-state))
     (update-player player)
     (observe-universe universe 0.10)
     (loop for enemy in enemies
           do (seek-player enemy player))))
 
 
+(defun elapsed-time-text (level)
+  (with-slots (start-time) level
+    (let ((elapsed (- (ge.util:real-time-seconds) start-time)))
+     (format nil "~2,'0d:~2,'0d"
+             (floor (/ elapsed 60))
+             (floor (mod elapsed 60))))))
+
+
 (defmethod draw ((this level))
-  (with-slots (player projectiles enemies) this
+  (with-slots (player projectiles enemies start-time) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*
                :fill-paint *background-color*)
     (render player)
     (loop for projectile in projectiles
           do (render projectile))
     (loop for enemy in enemies
-          do (render enemy))))
+          do (render enemy))
+    (draw-text (elapsed-time-text this)
+               (vec2 5 5)
+               :fill-color *foreground-color*)))
 
 
 (defmethod collide-p ((this player) (that projectile))
@@ -143,13 +166,17 @@
   (collide this that))
 
 (defmethod collide ((this player) (that enemy))
-  (push-action (lambda () (transition-to 'end-screen))))
+  (level-next-state 'end-screen :total-time (elapsed-time-text (current-state))
+                                :reason :enemy
+                                :score (level-score (current-state))))
 
 (defmethod collide ((that enemy) (this player))
   (collide this that))
 
 (defmethod collide ((this player) (that projectile))
-  (push-action (lambda () (transition-to 'end-screen))))
+  (level-next-state 'end-screen :total-time (elapsed-time-text (current-state))
+                                :reason :projectile
+                                :score (level-score (current-state))))
 
 (defmethod collide ((that projectile) (this player))
   (collide this that))
