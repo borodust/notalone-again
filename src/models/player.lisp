@@ -1,8 +1,11 @@
 (cl:in-package :notalone-again)
 
 
+(defparameter *player-bow* (vec2 30 0))
+
+
 (defparameter *player-shape-vertices* (list (vec2 0 -10)
-                                            (vec2 30 0)
+                                            *player-bow*
                                             (vec2 0 10)))
 
 
@@ -39,6 +42,28 @@
 (defun update-player-position (player x y)
   (with-slots (body) player
     (setf (body-position body) (vec2 x y))))
+
+
+(defun player-position (player)
+  (with-slots (body) player
+    (body-position body)))
+
+
+(defun player-bow-position (player)
+  (with-slots (body) player
+    (add (body-position body)
+         (mult (body-rotation body)
+               *player-bow*))))
+
+
+(defun player-velocity (player)
+  (with-slots (body) player
+    (body-linear-velocity body)))
+
+
+(defun player-rotation (player)
+  (with-slots (body) player
+    (body-rotation body)))
 
 
 (defun update-player-rotation (player angle)
@@ -99,19 +124,7 @@
 
 (defun update-player (player)
   (with-slots (body) player
-    (let ((position (body-position body)))
-      (when (> (x position) *viewport-width*)
-        (setf (body-position body) (vec2 (mod (x position) *viewport-width*)
-                                         (y position))))
-      (when (> (y position) *viewport-height*)
-        (setf (body-position body) (vec2 (x position)
-                                         (mod (y position) *viewport-height*))))
-      (when (< (x position) 0)
-        (setf (body-position body) (vec2 (+ (x position) *viewport-width*)
-                                         (y position))))
-      (when (< (y position) 0)
-        (setf (body-position body) (vec2 (x position)
-                                         (+ (y position) *viewport-height*))))))
+    (setf (body-position body) (warp-position (body-position body))))
   (update-thrust player)
   (update-turn player))
 

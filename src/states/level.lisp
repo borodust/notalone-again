@@ -3,13 +3,24 @@
 
 (defclass level (state-input-handler)
   ((universe :initform nil)
-   (player :initform nil)))
+   (player :initform nil)
+   (projectiles :initform nil)))
+
+
+(defun on-pre-solve (this that)
+  (collide-p (shape-substance this) (shape-substance that)))
+
+
+(defun on-post-solve (this that)
+  (collide (shape-substance this) (shape-substance that)))
 
 
 (defmethod initialize-state ((this level) &key)
   (call-next-method)
   (with-slots (universe player) this
-    (setf universe (make-universe :2d)
+    (setf universe (make-universe :2d
+                                  :on-pre-solve #'on-pre-solve
+                                  :on-post-solve #'on-post-solve)
           player (make-player universe))
     (update-player-position player 100 100)
     (update-player-rotation player 0)))
@@ -53,7 +64,12 @@
   )
 
 (defmethod button-pressed ((this level) (button (eql :space)))
-  )
+  (with-slots (universe projectiles player) this
+    (let ((projectile (fire-projectile universe
+                                       (player-bow-position player)
+                                       (player-rotation player)
+                                       (vector-length (player-velocity player)))))
+      (push projectile projectiles ))))
 
 (defmethod button-released ((this level) (button (eql :escape)))
   (transition-to 'loading-screen))
@@ -69,7 +85,9 @@
 
 
 (defmethod draw ((this level))
-  (with-slots (player) this
+  (with-slots (player projectiles) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*
                :fill-paint *background-color*)
-    (render player)))
+    (render player)
+    (loop for projectile in projectiles
+          do (render projectile))))
