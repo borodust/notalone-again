@@ -1,5 +1,10 @@
 (cl:in-package :notalone-again)
 
+(defparameter *base-batch-cooldown* 10)
+(defparameter *spawn-points* (list (vec2 600 400)
+                                   (vec2 200 400)
+                                   (vec2 600 200)
+                                   (vec2 200 200)))
 
 (defclass level (state-input-handler)
   ((universe :initform nil)
@@ -7,6 +12,7 @@
    (projectiles :initform nil)
    (enemies :initform nil)
    (start-time :initform (ge.util:real-time-seconds))
+   (last-spawn :initform nil)
    (next-state :initform nil)
    (score :initform 0 :reader level-score)))
 
@@ -31,6 +37,13 @@
       (push enemy enemies))))
 
 
+(defun spawn-batch (this)
+  (with-slots (last-spawn) this
+    (loop for spawn-point in *spawn-points*
+          do (spawn-enemy this (x spawn-point) (y spawn-point)))
+    (setf last-spawn (ge.util:real-time-seconds))))
+
+
 (defun kill-enemy (enemy projectile)
   (with-slots (enemies projectiles universe score) (current-state)
     (when (member enemy enemies)
@@ -51,9 +64,7 @@
           player (make-player universe))
     (update-player-position player 100 100)
     (update-player-rotation player 0)
-    (spawn-enemy this 600 400)
-    (spawn-enemy this 200 400)
-    (spawn-enemy this 600 200)))
+    (spawn-batch this)))
 
 
 (defmethod discard-state ((this level))
@@ -109,14 +120,24 @@
   (transition-to 'level))
 
 
+(defun next-batch-spawn-cooldown (level)
+  (with-slots (start-time) level
+    (max (* *base-batch-cooldown*
+            (- 1 (/ (max (- (ge.util:real-time-seconds) start-time) 1) 60)))
+         2)))
+
+
 (defmethod act ((this level))
-  (with-slots (player universe enemies next-state) this
+  (with-slots (player universe enemies next-state last-spawn) this
     (when next-state
       (apply #'transition-to next-state))
     (update-player player)
     (observe-universe universe 0.10)
     (loop for enemy in enemies
-          do (seek-player enemy player))))
+          do (seek-player enemy player))
+    (when (> (- (ge.util:real-time-seconds) last-spawn)
+             (next-batch-spawn-cooldown this))
+      (spawn-batch this))))
 
 
 (defun elapsed-time-text (level)
