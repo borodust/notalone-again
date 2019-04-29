@@ -2,7 +2,22 @@
 
 
 (defclass loading-screen (state-input-handler)
-  ((player :initform (make-instance 'player))))
+  ((universe :initform nil)
+   (player :initform nil)))
+
+
+(defmethod initialize-state ((this loading-screen) &key)
+  (call-next-method)
+  (with-slots (player universe) this
+    (setf universe (make-universe :2d)
+          player (make-player universe))))
+
+
+(defmethod discard-state ((this loading-screen))
+  (with-slots (universe player) this
+    (destroy-player player)
+    (dispose universe))
+  (call-next-method))
 
 
 (defmethod button-pressed ((this loading-screen) (button (eql :enter)))

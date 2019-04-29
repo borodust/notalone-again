@@ -11,6 +11,10 @@
       (setf text "HI"))))
 
 
+(defmethod button-pressed ((this main-menu) (button (eql :enter)))
+  (transition-to 'level))
+
+
 (defmethod button-pressed ((this main-menu) button)
   (update-bag-display this))
 

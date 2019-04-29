@@ -5,7 +5,9 @@
   :mailto "mail@borodust.org"
   :depends-on (alexandria trivial-gamekit
                           trivial-gamekit-fistmachine
-                          trivial-gamekit-input-handler)
+                          trivial-gamekit-input-handler
+                          cl-bodge/physics
+                          cl-bodge/physics/2d)
   :serial t
   :pathname "src/"
   :components ((:file "packages")
@@ -16,5 +18,6 @@
                (:module "states"
                 :serial t
                 :components ((:file "main-menu")
-                             (:file "loading-screen")))
+                             (:file "loading-screen")
+                             (:file "level")))
                (:file "main")))
