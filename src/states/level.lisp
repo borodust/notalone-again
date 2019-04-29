@@ -118,8 +118,14 @@
           do (render enemy))))
 
 
+(defmethod collide-p ((this player) (that projectile))
+  t)
+
+(defmethod collide-p ((that projectile) (this player))
+  (collide-p this that))
+
 (defmethod collide-p ((this player) (that enemy))
-  nil)
+  t)
 
 (defmethod collide-p ((that enemy) (this player))
   (collide-p this that))
@@ -130,10 +136,20 @@
 (defmethod collide-p ((that projectile) (this enemy))
   (collide-p this that))
 
-
 (defmethod collide ((this enemy) (that projectile))
   (push-action (lambda () (kill-enemy this that))))
 
-
 (defmethod collide ((that projectile) (this enemy))
+  (collide this that))
+
+(defmethod collide ((this player) (that enemy))
+  (push-action (lambda () (transition-to 'end-screen))))
+
+(defmethod collide ((that enemy) (this player))
+  (collide this that))
+
+(defmethod collide ((this player) (that projectile))
+  (push-action (lambda () (transition-to 'end-screen))))
+
+(defmethod collide ((that projectile) (this player))
   (collide this that))

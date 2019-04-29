@@ -20,6 +20,6 @@
                (:module "states"
                 :serial t
                 :components ((:file "main-menu")
-                             (:file "loading-screen")
-                             (:file "level")))
+                             (:file "level")
+                             (:file "end-screen")))
                (:file "main")))

@@ -1,30 +1,40 @@
 (cl:in-package :notalone-again)
 
+
 (defclass main-menu (state-input-handler)
-  ((text :initform "HI")))
+  ((universe :initform nil)
+   (player :initform nil)))
 
 
-(defun update-bag-display (this)
-  (with-slots (text) this
-    (alexandria:if-let ((bag (pressed-buttons this)))
-      (setf text (format nil "INDEED: ~A" (pressed-buttons this)))
-      (setf text "HI"))))
+(defmethod initialize-state ((this main-menu) &key)
+  (call-next-method)
+  (with-slots (player universe) this
+    (setf universe (make-universe :2d)
+          player (make-player universe))))
+
+
+(defmethod discard-state ((this main-menu))
+  (with-slots (universe player) this
+    (destroy-player player)
+    (dispose universe))
+  (call-next-method))
 
 
 (defmethod button-pressed ((this main-menu) (button (eql :enter)))
   (transition-to 'level))
 
 
-(defmethod button-pressed ((this main-menu) button)
-  (update-bag-display this))
-
-
-(defmethod button-released ((this main-menu) button)
-  (update-bag-display this))
-
-
 (defmethod draw ((this main-menu))
-  (with-slots (text) this
+  (with-slots (player) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*
                :fill-paint *background-color*)
-    (draw-text text (vec2 100 100) :fill-color *foreground-color*)))
+    (let ((time (bodge-util:real-time-seconds)))
+      (update-player-position player
+                              (+ (* (cos time) 120) 400)
+                              (+ (* (sin time) 40) 300))
+      (update-player-rotation player (* time 2)))
+    (render player)
+    (draw-text "NOTALONE: AGAIN"
+               (vec2 (- (/ *viewport-width* 2) 50)
+                     (/ *viewport-height* 2))
+               :fill-color *foreground-color*)))

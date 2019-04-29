@@ -5,7 +5,7 @@
   ()
   (:viewport-width *viewport-width*)
   (:viewport-height *viewport-height*)
-  (:default-initargs :initial-state 'loading-screen))
+  (:default-initargs :initial-state 'main-menu))
 
 
 (defmethod initialize-instance ((this notalone-again) &rest args &key depends-on)
