@@ -15,7 +15,8 @@
                (:module "models"
                 :serial t
                 :components ((:file "projectile")
-                             (:file "player")))
+                             (:file "player")
+                             (:file "enemy")))
                (:module "states"
                 :serial t
                 :components ((:file "main-menu")

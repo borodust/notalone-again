@@ -23,7 +23,7 @@
                                             (+ initial-speed *projectile-speed*)))))
 
 
-(defun fire-projectile (universe position rotation initial-speed)
+(defun make-projectile (universe position rotation initial-speed)
   (make-instance 'projectile :universe universe
                              :position position
                              :rotation rotation

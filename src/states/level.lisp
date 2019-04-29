@@ -4,7 +4,8 @@
 (defclass level (state-input-handler)
   ((universe :initform nil)
    (player :initform nil)
-   (projectiles :initform nil)))
+   (projectiles :initform nil)
+   (enemies :initform nil)))
 
 
 (defun on-pre-solve (this that)
@@ -15,6 +16,12 @@
   (collide (shape-substance this) (shape-substance that)))
 
 
+(defun spawn-enemy (level x y)
+  (with-slots (enemies universe) level
+    (let ((enemy (make-enemy universe x y)))
+      (push enemy enemies))))
+
+
 (defmethod initialize-state ((this level) &key)
   (call-next-method)
   (with-slots (universe player) this
@@ -23,12 +30,19 @@
                                   :on-post-solve #'on-post-solve)
           player (make-player universe))
     (update-player-position player 100 100)
-    (update-player-rotation player 0)))
+    (update-player-rotation player 0)
+    (spawn-enemy this 600 400)
+    (spawn-enemy this 200 400)
+    (spawn-enemy this 600 200)))
 
 
 (defmethod discard-state ((this level))
-  (with-slots (universe player) this
+  (with-slots (universe player projectiles enemies) this
     (destroy-player player)
+    (loop for projectile in projectiles
+          do (destroy-projectile projectile))
+    (loop for enemy in enemies
+          do (destroy-enemy enemy))
     (dispose universe))
   (call-next-method))
 
@@ -57,15 +71,12 @@
   (with-slots (player) this
     (disengage-thrust player)))
 
-(defmethod button-pressed ((this level) (button (eql :k)))
-  )
-
-(defmethod button-released ((this level) (button (eql :k)))
-  )
+(defmethod button-released ((this level) (button (eql :p)))
+  (spawn-enemy this 400 300))
 
 (defmethod button-pressed ((this level) (button (eql :space)))
   (with-slots (universe projectiles player) this
-    (let ((projectile (fire-projectile universe
+    (let ((projectile (make-projectile universe
                                        (player-bow-position player)
                                        (player-rotation player)
                                        (vector-length (player-velocity player)))))
@@ -79,15 +90,19 @@
 
 
 (defmethod act ((this level))
-  (with-slots (player universe) this
+  (with-slots (player universe enemies) this
     (update-player player)
-    (observe-universe universe 0.10)))
+    (observe-universe universe 0.10)
+    (loop for enemy in enemies
+          do (seek-player enemy player))))
 
 
 (defmethod draw ((this level))
-  (with-slots (player projectiles) this
+  (with-slots (player projectiles enemies) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*
                :fill-paint *background-color*)
     (render player)
     (loop for projectile in projectiles
-          do (render projectile))))
+          do (render projectile))
+    (loop for enemy in enemies
+          do (render enemy))))

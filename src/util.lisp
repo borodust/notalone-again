@@ -6,9 +6,7 @@
 (defparameter *background-color* (vec4 0.2 0.2 0.2 1.0))
 (defparameter *foreground-color* (vec4 0.8 0.8 0.8 1.0))
 (defparameter *zero-origin* (vec2 0 0))
-
 (defparameter *ox-unit* (vec2 1 0))
-
 
 (defgeneric render (object))
 
