@@ -16,7 +16,8 @@
     (setf body (make-rigid-body universe)
           shape (make-circle-shape universe
                                    *projectile-radius*
-                                   :body body))
+                                   :body body
+                                   :substance this))
     (setf (body-position body) position
           (body-linear-velocity body) (mult rotation
                                             *ox-unit*

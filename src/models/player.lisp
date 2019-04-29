@@ -26,7 +26,8 @@
     (setf body (make-rigid-body universe)
           shape (make-polygon-shape universe
                                     *player-shape-vertices*
-                                    :body body))))
+                                    :body body
+                                    :substance this))))
 
 
 (defun make-player (universe)

@@ -1,7 +1,7 @@
 (cl:in-package :notalone-again)
 
 
-(defparameter *enemy-radius* 10)
+(defparameter *enemy-radius* 12)
 (defparameter *enemy-teeth* 30)
 (defparameter *enemy-shape-vertices* (loop for i from 0 below *enemy-teeth*
                                            for angle = (* (/ (* 2 pi) *enemy-teeth*) i)
@@ -24,7 +24,8 @@
           (body-position body) position
           shape (make-polygon-shape universe
                                     *enemy-shape-vertices*
-                                    :body body))))
+                                    :body body
+                                    :substance this))))
 
 
 (defun make-enemy (universe x y)
@@ -61,7 +62,7 @@
       (flet ((render-object (x-offset y-offset)
                (with-pushed-canvas ()
                  (translate-canvas (+ (x position) x-offset) (+ (y position) y-offset))
-                 (let ((ratio (- 1 (* (abs (cos (* (ge.util:real-time-seconds) 4))) 0.1))))
+                 (let ((ratio (- 1 (* (abs (cos (* (ge.util:real-time-seconds) 4))) 0.2))))
                    (scale-canvas ratio ratio))
                  (draw-polygon *enemy-shape-vertices*
                                :fill-paint (vec4 0.8 0.8 0.8 1)))))

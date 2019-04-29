@@ -22,6 +22,16 @@
       (push enemy enemies))))
 
 
+(defun kill-enemy (enemy projectile)
+  (with-slots (enemies projectiles universe) (current-state)
+    (when (member enemy enemies)
+      (destroy-enemy enemy)
+      (alexandria:deletef enemies enemy))
+    (when (member projectile projectiles)
+      (destroy-projectile projectile)
+      (alexandria:deletef projectiles projectile))))
+
+
 (defmethod initialize-state ((this level) &key)
   (call-next-method)
   (with-slots (universe player) this
@@ -106,3 +116,24 @@
           do (render projectile))
     (loop for enemy in enemies
           do (render enemy))))
+
+
+(defmethod collide-p ((this player) (that enemy))
+  nil)
+
+(defmethod collide-p ((that enemy) (this player))
+  (collide-p this that))
+
+(defmethod collide-p ((this enemy) (that projectile))
+  t)
+
+(defmethod collide-p ((that projectile) (this enemy))
+  (collide-p this that))
+
+
+(defmethod collide ((this enemy) (that projectile))
+  (push-action (lambda () (kill-enemy this that))))
+
+
+(defmethod collide ((that projectile) (this enemy))
+  (collide this that))
