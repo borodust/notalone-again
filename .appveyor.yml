@@ -22,8 +22,10 @@ branches:
 install:
   - set PATH=C:\msys64\usr\bin\;%PATH%
   - pacman --noconfirm -Syu
-  - pacman --noconfirm -S zip
+  - pacman --noconfirm -S zip mingw-w64-x86_64-git-lfs
+  - sh -c "git lfs install && git lfs pull"
   - sh -c "curl -L http://bodge.borodust.org/files/install.sh | sh"
+
 
 build_script:
   - >

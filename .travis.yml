@@ -24,8 +24,13 @@ os:
   - linux
   - osx
 
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
+
 install:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install git-lfs; fi
   - curl -L http://bodge.borodust.org/files/install.sh | sh
+  - git lfs pull
 
 script:
   - >
