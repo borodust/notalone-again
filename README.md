@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/borodust/notalone-again.svg)](https://travis-ci.org/borodust/notalone-again) [![Build status](https://ci.appveyor.com/api/projects/status/v4e7h5m0ibdf6k4n?svg=true)](https://ci.appveyor.com/project/borodust/notalone-again)
+
 # NOTALONE: AGAIN
 
 You wake up nowhere in a galactic. Unknown lifeforms surrounds you, but your ol' pal "SHIPWRECK" is with you. SHOOT 'EM ALL!
