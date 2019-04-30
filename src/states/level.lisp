@@ -36,6 +36,7 @@
 
 (defun spawn-batch (this)
   (with-slots (last-spawn) this
+    (play-sound :portal)
     (loop for spawn-point in *spawn-points*
           do (spawn-enemy this (x spawn-point) (y spawn-point)))
     (setf last-spawn (ge.util:real-time-seconds))))
@@ -44,6 +45,7 @@
 (defun kill-enemy (enemy projectile)
   (with-slots (enemies projectiles universe score) (current-state)
     (when (member enemy enemies)
+      (play-sound :explosion)
       (destroy-enemy enemy)
       (alexandria:deletef enemies enemy)
       (incf score))
@@ -55,6 +57,7 @@
 (defmethod initialize-state ((this level) &key)
   (call-next-method)
   (with-slots (universe player) this
+    (play-sound :unknown-energy :looped-p t)
     (setf universe (make-universe :2d :on-pre-solve #'on-pre-solve)
           player (make-player universe))
     (update-player-position player 100 100)
@@ -69,7 +72,8 @@
           do (destroy-projectile projectile))
     (loop for enemy in enemies
           do (destroy-enemy enemy))
-    (dispose universe))
+    (dispose universe)
+    (stop-sound :unknown-energy))
   (call-next-method))
 
 
@@ -106,7 +110,8 @@
                                        (player-bow-position player)
                                        (player-rotation player)
                                        (vector-length (player-velocity player)))))
-      (push projectile projectiles ))))
+      (play-sound :weapon)
+      (push projectile projectiles))))
 
 (defmethod button-released ((this level) (button (eql :escape)))
   (transition-to 'loading-screen))
@@ -144,7 +149,7 @@
 
 
 (defmethod draw ((this level))
-  (with-slots (player projectiles enemies start-time) this
+  (with-slots (player projectiles enemies start-time score) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*
                :fill-paint *background-color*)
     (render player)
@@ -154,6 +159,9 @@
           do (render enemy))
     (draw-text (elapsed-time-text this)
                (vec2 5 5)
+               :fill-color *foreground-color*)
+    (draw-text (format nil "~2,'0d" score)
+               (vec2 65 5)
                :fill-color *foreground-color*)))
 
 

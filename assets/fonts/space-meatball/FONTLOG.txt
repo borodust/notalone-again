@@ -1,0 +1,9 @@
+"N" "A" "S" are in the public domain per US Code Title 17 Section 105
+Typeface designed by James Modarelli in 1958 as a NASA official
+All other glyphs are created by Tim Nash and licensed under CC0 (https://creativecommons.org/publicdomain/zero/1.0/). The creator dedicated this work to the public domain by waiving all their rights to the work worldwide under copyright law, including all related and neighboring rights, to the extent allowed by law. You can copy, modify, distribute and perform the work, even for commercial purposes, all without asking permission. 
+However, use of NASA logos is restricted independent of copyright.
+
+----
+"Space Meatball" is based on the NASA Meatball logo designed by James Moradelli. 
+
+Ver 1.000 contains basic Latin set A-Z.
