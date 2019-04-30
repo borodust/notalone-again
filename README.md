@@ -2,7 +2,9 @@
 
 # NOTALONE: AGAIN
 
-You wake up nowhere in a galactic. Unknown lifeforms surrounds you, but your ol' pal "SHIPWRECK" is with you. SHOOT 'EM ALL!
+You wake up nowhere in a galactic. Unknown lifeforms surround you, but your ol' pal "SHIPWRECK" is with you.
+
+SHOOT 'EM ALL!
 
 Lisp Game Jam 2019 entry
 
