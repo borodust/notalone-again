@@ -5,6 +5,7 @@
   ()
   (:viewport-width *viewport-width*)
   (:viewport-height *viewport-height*)
+  (:viewport-title "NOTALONE: AGAIN")
   (:prepare-resources nil)
   (:default-initargs :initial-state 'loading-screen))
 
