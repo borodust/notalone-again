@@ -18,11 +18,8 @@
 
 
 (defun on-pre-solve (this that)
-  (collide-p (shape-substance this) (shape-substance that)))
-
-
-(defun on-post-solve (this that)
-  (collide (shape-substance this) (shape-substance that)))
+  (collide (shape-substance this) (shape-substance that))
+  nil)
 
 
 (defun level-next-state (state &rest args &key &allow-other-keys)
@@ -58,9 +55,7 @@
 (defmethod initialize-state ((this level) &key)
   (call-next-method)
   (with-slots (universe player) this
-    (setf universe (make-universe :2d
-                                  :on-pre-solve #'on-pre-solve
-                                  :on-post-solve #'on-post-solve)
+    (setf universe (make-universe :2d :on-pre-solve #'on-pre-solve)
           player (make-player universe))
     (update-player-position player 100 100)
     (update-player-rotation player 0)
@@ -132,9 +127,9 @@
     (when next-state
       (apply #'transition-to next-state))
     (update-player player)
-    (observe-universe universe 0.10)
     (loop for enemy in enemies
           do (seek-player enemy player))
+    (observe-universe universe 0.10)
     (when (> (- (ge.util:real-time-seconds) last-spawn)
              (next-batch-spawn-cooldown this))
       (spawn-batch this))))
@@ -162,28 +157,12 @@
                :fill-color *foreground-color*)))
 
 
-(defmethod collide-p ((this player) (that projectile))
-  t)
+(defmethod collide ((this player) (that projectile))
+  (level-next-state 'end-screen :total-time (elapsed-time-text (current-state))
+                                :reason :projectile
+                                :score (level-score (current-state))))
 
-(defmethod collide-p ((that projectile) (this player))
-  (collide-p this that))
-
-(defmethod collide-p ((this player) (that enemy))
-  t)
-
-(defmethod collide-p ((that enemy) (this player))
-  (collide-p this that))
-
-(defmethod collide-p ((this enemy) (that projectile))
-  t)
-
-(defmethod collide-p ((that projectile) (this enemy))
-  (collide-p this that))
-
-(defmethod collide ((this enemy) (that projectile))
-  (push-action (lambda () (kill-enemy this that))))
-
-(defmethod collide ((that projectile) (this enemy))
+(defmethod collide ((that projectile) (this player))
   (collide this that))
 
 (defmethod collide ((this player) (that enemy))
@@ -194,10 +173,8 @@
 (defmethod collide ((that enemy) (this player))
   (collide this that))
 
-(defmethod collide ((this player) (that projectile))
-  (level-next-state 'end-screen :total-time (elapsed-time-text (current-state))
-                                :reason :projectile
-                                :score (level-score (current-state))))
+(defmethod collide ((this enemy) (that projectile))
+  (kill-enemy this that))
 
-(defmethod collide ((that projectile) (this player))
+(defmethod collide ((that projectile) (this enemy))
   (collide this that))

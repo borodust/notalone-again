@@ -11,10 +11,6 @@
 (defgeneric render (object))
 
 
-(defgeneric collide-p (this that)
-  (:method (this that) nil))
-
-
 (defgeneric collide (this that)
   (:method (this that) nil))
 

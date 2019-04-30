@@ -22,10 +22,10 @@
   (with-slots (body shape) this
     (setf body (make-rigid-body universe)
           (body-position body) position
-          shape (make-polygon-shape universe
-                                    *enemy-shape-vertices*
-                                    :body body
-                                    :substance this))))
+          shape (make-circle-shape universe
+                                   *enemy-radius*
+                                   :body body
+                                   :substance this))))
 
 
 (defun make-enemy (universe x y)
@@ -41,24 +41,24 @@
 
 (defun seek-player (enemy player)
   (with-slots (body) enemy
-    (let* ((player-position (player-position player))
-           (position (body-position body))
-           (popo-vec (subt player-position position))
+    (let* ((popo-vec (subt (player-position player) (body-position body)))
            (distance (vector-length popo-vec))
-           (target-direction (div popo-vec distance))
-           (velocity (body-linear-velocity body))
-           (speed (vector-length velocity))
-           (direction (div velocity speed)))
+           (target-direction (div popo-vec distance)))
       (apply-force body (mult target-direction *enemy-acceleration*))
       (when (< distance 100)
-        (let* ((target-speed (min speed (+ (* speed (/ distance 100)) 10)))
+        (let* ((velocity (body-linear-velocity body))
+               (speed (vector-length velocity))
+               (direction (div velocity speed))
+               (target-speed (min speed (+ (* speed (/ distance 100)) 10)))
                (target-force (- target-speed speed)))
           (apply-force body (mult direction target-force)))))))
 
 
 (defmethod render ((this enemy))
   (with-slots (body) this
-    (let ((position (setf (body-position body) (warp-position (body-position body)))))
+    (let ((position (setf (body-position body) (handler-case
+                                                   (warp-position (body-position body))
+                                                 (t () (vec2 0 0))))))
       (flet ((render-object (x-offset y-offset)
                (with-pushed-canvas ()
                  (translate-canvas (+ (x position) x-offset) (+ (y position) y-offset))
