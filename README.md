@@ -34,3 +34,15 @@ You also can install it via `quicklisp`:
 * OpenGL 2.1+
 * 64-bit (x86_64) Windows, GNU/Linux or macOS
 * x86_64 SBCL or CCL
+
+
+## Credits
+
+* Sound Effects
+  * [The Essential Retro Video Game Sound Effects Collection](https://opengameart.org/content/512-sound-effects-8-bit-style), CC0
+* Music
+  * [Unknown Energy by Dox](https://www.free-stock-music.com/dox-unknown-energy.html), CC BY-ND 3.0
+  * [The Anomaly by Tristan Lohengrin](https://www.free-stock-music.com/tristan-lohengrin-the-anomaly.html), CC BY 3.0
+* Fonts
+  * [Avara](https://fontlibrary.org/en/font/avara), OFL
+  * [Space Meatball](https://fontlibrary.org/en/font/space-meatball), Public Domain
