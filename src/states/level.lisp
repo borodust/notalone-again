@@ -79,19 +79,19 @@
 
 (defmethod button-pressed ((this level) (button (eql :f)))
   (with-slots (player) this
-    (turn-left player)))
+    (turn-right player)))
 
 (defmethod button-released ((this level) (button (eql :f)))
   (with-slots (player) this
-    (stop-left-turn player)))
+    (stop-right-turn player)))
 
 (defmethod button-pressed ((this level) (button (eql :d)))
   (with-slots (player) this
-    (turn-right player)))
+    (turn-left player)))
 
 (defmethod button-released ((this level) (button (eql :d)))
   (with-slots (player) this
-    (stop-right-turn player)))
+    (stop-left-turn player)))
 
 (defmethod button-pressed ((this level) (button (eql :j)))
   (with-slots (player) this
@@ -101,10 +101,39 @@
   (with-slots (player) this
     (disengage-thrust player)))
 
+(defmethod dpad-changed ((this level) (button (eql :up)))
+  (with-slots (player) this
+    (engage-thrust player)))
+
+(defmethod dpad-changed ((this level) (button (eql :left)))
+  (with-slots (player) this
+    (turn-left player)))
+
+(defmethod dpad-changed ((this level) (button (eql :right)))
+  (with-slots (player) this
+    (turn-right player)))
+
+(defmethod dpad-changed ((this level) (button (eql :left-up)))
+  (with-slots (player) this
+    (engage-thrust player)
+    (turn-left player)))
+
+(defmethod dpad-changed ((this level) (button (eql :right-up)))
+  (with-slots (player) this
+    (engage-thrust player)
+    (turn-right player)))
+
+(defmethod dpad-changed ((this level) (button (eql :centered)))
+  (with-slots (player) this
+    (stop-left-turn player)
+    (stop-right-turn player)
+    (disengage-thrust player)))
+
+
 (defmethod button-released ((this level) (button (eql :p)))
   (spawn-enemy this 400 300))
 
-(defmethod button-pressed ((this level) (button (eql :space)))
+(defun shoot (this)
   (with-slots (universe projectiles player) this
     (let ((projectile (make-projectile universe
                                        (player-bow-position player)
@@ -112,6 +141,12 @@
                                        (vector-length (player-velocity player)))))
       (play-sound :weapon)
       (push projectile projectiles))))
+
+(defmethod button-pressed ((this level) (button (eql :space)))
+  (shoot this))
+
+(defmethod button-pressed ((this level) (button (eql :gamepad-right-bumper)))
+  (shoot this))
 
 (defmethod button-released ((this level) (button (eql :escape)))
   (transition-to 'loading-screen))

@@ -26,6 +26,10 @@
   (transition-to 'level))
 
 
+(defmethod button-pressed ((this end-screen) (button (eql :gamepad-start)))
+  (transition-to 'level))
+
+
 (defmethod draw ((this end-screen))
   (with-slots (reason total-time score space-font avara-font) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*

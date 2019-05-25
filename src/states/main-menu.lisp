@@ -30,6 +30,10 @@
   (transition-to 'level))
 
 
+(defmethod button-pressed ((this main-menu) (button (eql :gamepad-start)))
+  (transition-to 'level))
+
+
 (defmethod draw ((this main-menu))
   (with-slots (player space-font avara-font) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*
@@ -49,7 +53,7 @@
                  :fill-color *foreground-color*
                  :font space-font))
     (draw-text "PRESS ENTER TO START"
-                 (vec2 (- (/ *viewport-width* 2) 120)
-                       (- (/ *viewport-height* 2) 200))
-                 :fill-color *foreground-color*
-                 :font avara-font)))
+               (vec2 (- (/ *viewport-width* 2) 120)
+                     (- (/ *viewport-height* 2) 200))
+               :fill-color *foreground-color*
+               :font avara-font)))

@@ -113,12 +113,12 @@
           (current-angle (mat2->euler-angle (body-rotation body)))
           (angle-delta 0))
       (when left-turn-started-at
-        (incf angle-delta (- (* (- current-time left-turn-started-at)
-                                *turn-speed*)))
+        (incf angle-delta (* (- current-time left-turn-started-at)
+                             *turn-speed*))
         (setf left-turn-started-at current-time))
       (when right-turn-started-at
-        (incf angle-delta (* (- current-time right-turn-started-at)
-                             *turn-speed*))
+        (incf angle-delta (- (* (- current-time right-turn-started-at)
+                                *turn-speed*)))
         (setf right-turn-started-at current-time))
       (update-player-rotation player (+ current-angle angle-delta)))))
 
