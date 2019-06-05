@@ -9,17 +9,15 @@
    (avara-font :initform nil)))
 
 
-(defmethod initialize-state ((this end-screen) &key)
-  (call-next-method)
+(defmethod post-initialize ((this end-screen))
   (play-sound :the-anomaly)
   (with-slots (space-font avara-font) this
     (setf space-font (make-font :space-meatball 60)
           avara-font (make-font :avara 24))))
 
 
-(defmethod discard-state ((this end-screen))
-  (stop-sound :the-anomaly)
-  (call-next-method))
+(defmethod pre-destroy ((this end-screen))
+  (stop-sound :the-anomaly))
 
 
 (defmethod button-pressed ((this end-screen) (button (eql :enter)))

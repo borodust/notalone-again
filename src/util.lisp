@@ -18,13 +18,11 @@
 (defclass state-input-handler (input-handler) ())
 
 
-(defmethod initialize-state ((this state-input-handler) &key)
-  (call-next-method)
+(defmethod post-initialize :after ((this state-input-handler))
   (activate-input-handler this))
 
 
-(defmethod discard-state ((this state-input-handler))
-  (call-next-method)
+(defmethod pre-destroy :before ((this state-input-handler))
   (deactivate-input-handler this))
 
 

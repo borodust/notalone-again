@@ -4,6 +4,21 @@
 (defclass loading-screen () ())
 
 
+(defmethod post-initialize ((this loading-screen))
+  (prepare-resources :avara
+                     :space-meatball
+                     :unknown-energy
+                     :the-anomaly
+                     :explosion
+                     :weapon
+                     :portal))
+
+
+(defmethod notice-resources ((this loading-screen) &rest resource-names)
+  (declare (ignore resource-names))
+  (transition-to 'main-menu))
+
+
 (defmethod draw ((this loading-screen))
   (with-slots (player space-font avara-font) this
     (draw-rect *zero-origin* *viewport-width* *viewport-height*

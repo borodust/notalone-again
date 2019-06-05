@@ -54,8 +54,7 @@
       (alexandria:deletef projectiles projectile))))
 
 
-(defmethod initialize-state ((this level) &key)
-  (call-next-method)
+(defmethod post-initialize ((this level))
   (with-slots (universe player) this
     (play-sound :unknown-energy :looped-p t)
     (setf universe (make-universe :2d :on-pre-solve #'on-pre-solve)
@@ -65,7 +64,7 @@
     (spawn-batch this)))
 
 
-(defmethod discard-state ((this level))
+(defmethod pre-destroy ((this level))
   (with-slots (universe player projectiles enemies) this
     (destroy-player player)
     (loop for projectile in projectiles

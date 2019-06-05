@@ -8,7 +8,7 @@
    (avara-font :initform nil)))
 
 
-(defmethod initialize-state ((this main-menu) &key)
+(defmethod post-initialize ((this main-menu))
   (call-next-method)
   (with-slots (player universe space-font avara-font) this
     (setf universe (make-universe :2d)
@@ -18,7 +18,7 @@
     (play-sound :the-anomaly :looped-p t)))
 
 
-(defmethod discard-state ((this main-menu))
+(defmethod pre-destroy ((this main-menu))
   (with-slots (universe player) this
     (stop-sound :the-anomaly)
     (destroy-player player)
